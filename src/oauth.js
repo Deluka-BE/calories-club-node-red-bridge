@@ -2,6 +2,7 @@ import { HttpError, safeRemoteError } from "./utils.js";
 
 export function buildClientRegistrationRequest(config) {
   return {
+    app: "calories",
     client_name: "Node-RED Calories Club Bridge",
     redirect_uris: ["http://127.0.0.1/callback"],
     grant_types: [
