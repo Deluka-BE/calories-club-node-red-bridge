@@ -1,0 +1,14 @@
+services:
+  calories-club-bridge:
+    build: .
+    container_name: calories-club-bridge
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3107:3000"
+    volumes:
+      - calories-club-auth:/data
+
+volumes:
+  calories-club-auth:
