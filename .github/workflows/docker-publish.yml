@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -24,6 +24,22 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Read release version
+        id: version
+        shell: bash
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Create semantic Git tag
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          RELEASE_TAG: v${{ steps.version.outputs.version }}
+        run: |
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_TAG}"; then
+            git tag "${RELEASE_TAG}" "${GITHUB_SHA}"
+            git push origin "${RELEASE_TAG}"
+          fi
 
       - name: Set lowercase image name
         shell: bash
@@ -49,6 +65,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=v${{ steps.version.outputs.version }},enable=${{ github.ref == 'refs/heads/main' }}
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
