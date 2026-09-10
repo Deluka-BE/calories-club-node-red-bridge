@@ -14,6 +14,20 @@ export function buildClientRegistrationRequest(config) {
   };
 }
 
+export function buildClientRegistrationUrl(endpoint) {
+  const url = new URL(endpoint);
+  url.searchParams.set("app", "calories");
+  return url.toString();
+}
+
+export function buildDeviceAuthorizationRequest(config, clientId) {
+  return new URLSearchParams({
+    app: "calories",
+    client_id: clientId,
+    scope: config.scopes
+  });
+}
+
 export class OAuthManager {
   constructor(config, store) {
     this.config = config;
@@ -37,7 +51,7 @@ export class OAuthManager {
     const current = this.store.get();
     if (current.client_id) return current;
 
-    const response = await fetch(this.config.registrationEndpoint, {
+    const response = await fetch(buildClientRegistrationUrl(this.config.registrationEndpoint), {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
       body: JSON.stringify(buildClientRegistrationRequest(this.config))
@@ -62,7 +76,7 @@ export class OAuthManager {
     }
 
     const client = await this.registerClient();
-    const form = new URLSearchParams({ client_id: client.client_id, scope: this.config.scopes });
+    const form = buildDeviceAuthorizationRequest(this.config, client.client_id);
     const response = await fetch(this.config.deviceEndpoint, {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
