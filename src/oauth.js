@@ -1,5 +1,18 @@
 import { HttpError, safeRemoteError } from "./utils.js";
 
+export function buildClientRegistrationRequest(config) {
+  return {
+    client_name: "Node-RED Calories Club Bridge",
+    redirect_uris: ["http://127.0.0.1/callback"],
+    grant_types: [
+      "urn:ietf:params:oauth:grant-type:device_code",
+      "refresh_token"
+    ],
+    token_endpoint_auth_method: "none",
+    scope: config.scopes
+  };
+}
+
 export class OAuthManager {
   constructor(config, store) {
     this.config = config;
@@ -26,15 +39,7 @@ export class OAuthManager {
     const response = await fetch(this.config.registrationEndpoint, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({
-        client_name: "Node-RED Calories Club Bridge",
-        grant_types: [
-          "urn:ietf:params:oauth:grant-type:device_code",
-          "refresh_token"
-        ],
-        token_endpoint_auth_method: "none",
-        scope: this.config.scopes
-      })
+      body: JSON.stringify(buildClientRegistrationRequest(this.config))
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok || !body.client_id) {
