@@ -28,7 +28,9 @@ jobs:
       - name: Read release version
         id: version
         shell: bash
-        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Create semantic Git tag
         if: github.ref == 'refs/heads/main'
