@@ -4,6 +4,20 @@ Een kleine Dockerized Node.js-bridge. Node-RED stuurt een gewone HTTP POST naar
 `/workout`; de bridge beheert OAuth Device Authorization, token refresh en de
 MCP Streamable HTTP-sessie.
 
+## Home Assistant-app
+
+Deze repository kan ook rechtstreeks als aangepaste app-repository aan Home
+Assistant OS of Supervised worden toegevoegd:
+
+```text
+https://github.com/Deluka-BE/calories-club-node-red-bridge
+```
+
+Open **Instellingen → Apps → App-winkel → Repositories**, voeg de URL toe en
+installeer **Calories Club Node-RED Bridge**. De eerste appversie gebruikt poort
+`3107` en heeft bewust nog geen Ingress. Volledige instructies staan in
+`calories-club-bridge/DOCS.md`.
+
 ## Wat is gecontroleerd
 
 Op 10 september 2026 publiceerde Recordo:
