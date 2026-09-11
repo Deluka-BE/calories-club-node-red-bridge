@@ -63,4 +63,15 @@ export class WorkoutSync {
       return { action: "deleted", entry_id: existing.entry_id, result };
     });
   }
+
+  // Removes only local key → Calories Club entry-ID mappings. It deliberately
+  // does not touch OAuth credentials or delete anything in Calories Club.
+  async reset() {
+    return this.serial(async () => {
+      const mappings = this.store.get().workout_sync || {};
+      const cleared = Object.keys(mappings).length;
+      await this.store.merge({ workout_sync: {} });
+      return { action: "reset", cleared };
+    });
+  }
 }

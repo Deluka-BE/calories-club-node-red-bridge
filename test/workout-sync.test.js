@@ -38,3 +38,15 @@ test("an older source timestamp is rejected and deletion removes the saved mappi
   assert.deepEqual(calls, ["cc-1"]);
   assert.deepEqual(store.get().workout_sync, {});
 });
+
+test("reset clears only locally stored workout mappings", async () => {
+  const store = memoryStore({
+    refresh_token: "keep-this",
+    workout_sync: { a: { entry_id: "cc-1" }, b: { entry_id: "cc-2" } }
+  });
+  const sync = new WorkoutSync(store, {});
+  const result = await sync.reset();
+  assert.deepEqual(result, { action: "reset", cleared: 2 });
+  assert.deepEqual(store.get().workout_sync, {});
+  assert.equal(store.get().refresh_token, "keep-this");
+});

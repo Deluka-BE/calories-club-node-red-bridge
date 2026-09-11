@@ -176,6 +176,14 @@ PUT /workout/apple_health:other_active:2026-09-11
 - `DELETE /workout/<sleutel>` verwijdert de opgeslagen entry en de koppeling.
   Gebruik dit alleen voor een expliciete verwijderactie in Node-RED.
 
+### Eénmalig herstellen na een oude verkeerde dag-sleutel
+
+`DELETE /workout-sync` wist uitsluitend de lokale sleutel → entry-ID-koppelingen
+van de bridge. OAuth-login, refresh token en Calories Club-entries blijven
+ongewijzigd. Gebruik deze route alleen wanneer je de betreffende oude entries
+eerst handmatig in Calories Club hebt opgeruimd en daarna met correcte
+dag-sleutels opnieuw wilt synchroniseren.
+
 Niet aangemeld:
 
 ```json

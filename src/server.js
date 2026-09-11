@@ -41,6 +41,11 @@ const server = http.createServer(async (req, res) => {
       const result = await mcp.workout(workout);
       return sendJson(res, 200, { success: true, result });
     }
+    if (req.method === "DELETE" && url.pathname === "/workout-sync") {
+      requireApiKey(req);
+      const outcome = await workoutSync.reset();
+      return sendJson(res, 200, { success: true, ...outcome });
+    }
     const match = url.pathname.match(/^\/workout\/([^/]+)$/);
     if (match && req.method === "PUT") {
       requireApiKey(req);
