@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="calories-club-bridge/logo.png" alt="Deluka-BE kameleonlogo" width="128" height="128">
+</p>
+
 # Calories Club Node-RED bridge
 
 Een kleine Dockerized Node.js-bridge. Node-RED stuurt een gewone HTTP POST naar
