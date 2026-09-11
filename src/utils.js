@@ -90,3 +90,17 @@ export function validateWorkout(input) {
   ];
   return Object.fromEntries(fields.filter((key) => input[key] !== undefined).map((key) => [key, input[key]]));
 }
+
+export function validateExternalId(value) {
+  if (typeof value !== "string" || !/^[A-Za-z0-9:_-]{1,160}$/.test(value)) {
+    throw new HttpError(400, "workout key must contain only letters, numbers, :, _ or -");
+  }
+  return value;
+}
+
+export function validateRevision(value) {
+  if (!Number.isSafeInteger(value) || value < 1) {
+    throw new HttpError(400, "revision must be a positive integer");
+  }
+  return value;
+}

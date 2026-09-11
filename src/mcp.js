@@ -7,11 +7,23 @@ export class McpClient {
   }
 
   async workout(arguments_) {
+    return this.callTool("add_workout_entry", arguments_);
+  }
+
+  async updateWorkout(entryId, arguments_) {
+    return this.callTool("update_workout_entry", { entry_id: entryId, ...arguments_ });
+  }
+
+  async deleteEntry(entryId) {
+    return this.callTool("delete_entry", { entry_id: entryId });
+  }
+
+  async callTool(toolName, arguments_) {
     try {
-      return await this.runSession(arguments_, false);
+      return await this.runSession(toolName, arguments_, false);
     } catch (error) {
       if (error.status !== 401) throw error;
-      return this.runSession(arguments_, true);
+      return this.runSession(toolName, arguments_, true);
     }
   }
 
@@ -58,7 +70,7 @@ export class McpClient {
     return tools;
   }
 
-  async runSession(arguments_, forceRefresh) {
+  async runSession(toolName, arguments_, forceRefresh) {
     const token = await this.oauth.accessToken(forceRefresh);
     const initialize = await this.post(token, null, {
       jsonrpc: "2.0",
@@ -82,7 +94,7 @@ export class McpClient {
       jsonrpc: "2.0",
       id: 2,
       method: "tools/call",
-      params: { name: "add_workout_entry", arguments: arguments_ }
+      params: { name: toolName, arguments: arguments_ }
     }, 2);
 
     if (result.payload?.error) {

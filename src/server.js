@@ -3,12 +3,14 @@ import { config } from "./config.js";
 import { StateStore } from "./state.js";
 import { OAuthManager } from "./oauth.js";
 import { McpClient } from "./mcp.js";
-import { HttpError, readJson, sendJson, validateWorkout } from "./utils.js";
+import { WorkoutSync } from "./workout-sync.js";
+import { HttpError, readJson, sendJson, validateExternalId, validateRevision, validateWorkout } from "./utils.js";
 
 const store = new StateStore(config.stateFile);
 await store.load();
 const oauth = new OAuthManager(config, store);
 const mcp = new McpClient(config, oauth);
+const workoutSync = new WorkoutSync(store, mcp);
 
 if (oauth.status().login_pending) oauth.startPolling();
 
@@ -38,6 +40,22 @@ const server = http.createServer(async (req, res) => {
       const workout = validateWorkout(await readJson(req));
       const result = await mcp.workout(workout);
       return sendJson(res, 200, { success: true, result });
+    }
+    const match = url.pathname.match(/^\/workout\/([^/]+)$/);
+    if (match && req.method === "PUT") {
+      requireApiKey(req);
+      const body = await readJson(req);
+      const externalId = validateExternalId(decodeURIComponent(match[1]));
+      const revision = validateRevision(body.revision);
+      const workout = validateWorkout(body);
+      const outcome = await workoutSync.put(externalId, revision, workout);
+      return sendJson(res, 200, { success: true, ...outcome });
+    }
+    if (match && req.method === "DELETE") {
+      requireApiKey(req);
+      const externalId = validateExternalId(decodeURIComponent(match[1]));
+      const outcome = await workoutSync.delete(externalId);
+      return sendJson(res, 200, { success: true, ...outcome });
     }
     return sendJson(res, 404, { error: "Not found" });
   } catch (error) {

@@ -143,6 +143,39 @@ Succes:
 }
 ```
 
+## Eén bijwerkbare workout per externe sleutel
+
+`POST /workout` blijft beschikbaar voor gewone, nieuwe workouts. Voor een
+dagtotaal dat Auto Export opnieuw kan sturen, gebruikt Node-RED de nieuwe
+`PUT /workout/<sleutel>`-route. De bridge bewaart de Calories Club-entry-ID
+in zijn bestaande `/data/auth-state.json` en kiest daarna automatisch tussen
+aanmaken en `update_workout_entry`.
+
+Voorbeeld voor de overige actieve energie van 11 september:
+
+```json
+PUT /workout/apple_health:other_active:2026-09-11
+{
+  "revision": 2,
+  "title": "Overige actieve activiteit",
+  "emoji": "🔥",
+  "activity_type": "other",
+  "duration_minutes": 1,
+  "calories_burned": 234.5,
+  "notes": "Apple Health actieve energie minus geregistreerde workouts"
+}
+```
+
+- Eerste nieuwe sleutel: de bridge maakt één entry aan en bewaart het entry-ID.
+- Zelfde `revision`: de bridge antwoordt met `action: "unchanged"` zonder een
+  MCP-aanroep.
+- Hogere `revision`: de bridge werkt diezelfde entry bij met
+  `update_workout_entry`.
+- Lagere `revision`: HTTP 409; een oudere berekening mag de nieuwere niet
+  overschrijven.
+- `DELETE /workout/<sleutel>` verwijdert de opgeslagen entry en de koppeling.
+  Gebruik dit alleen voor een expliciete verwijderactie in Node-RED.
+
 Niet aangemeld:
 
 ```json
