@@ -98,9 +98,10 @@ export function validateExternalId(value) {
   return value;
 }
 
-export function validateRevision(value) {
-  if (!Number.isSafeInteger(value) || value < 1) {
-    throw new HttpError(400, "revision must be a positive integer");
+export function validateSourceUpdatedAt(value) {
+  if (value === undefined) return null;
+  if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
+    throw new HttpError(400, "source_updated_at must be an ISO 8601 timestamp");
   }
   return value;
 }

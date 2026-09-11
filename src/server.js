@@ -4,7 +4,7 @@ import { StateStore } from "./state.js";
 import { OAuthManager } from "./oauth.js";
 import { McpClient } from "./mcp.js";
 import { WorkoutSync } from "./workout-sync.js";
-import { HttpError, readJson, sendJson, validateExternalId, validateRevision, validateWorkout } from "./utils.js";
+import { HttpError, readJson, sendJson, validateExternalId, validateSourceUpdatedAt, validateWorkout } from "./utils.js";
 
 const store = new StateStore(config.stateFile);
 await store.load();
@@ -46,9 +46,9 @@ const server = http.createServer(async (req, res) => {
       requireApiKey(req);
       const body = await readJson(req);
       const externalId = validateExternalId(decodeURIComponent(match[1]));
-      const revision = validateRevision(body.revision);
+      const sourceUpdatedAt = validateSourceUpdatedAt(body.source_updated_at);
       const workout = validateWorkout(body);
-      const outcome = await workoutSync.put(externalId, revision, workout);
+      const outcome = await workoutSync.put(externalId, sourceUpdatedAt, workout);
       return sendJson(res, 200, { success: true, ...outcome });
     }
     if (match && req.method === "DELETE") {

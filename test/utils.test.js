@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseMcpPayload, validateExternalId, validateRevision, validateWorkout } from "../src/utils.js";
+import { parseMcpPayload, validateExternalId, validateSourceUpdatedAt, validateWorkout } from "../src/utils.js";
 
 test("parses an SSE JSON-RPC response", () => {
   const value = parseMcpPayload('event: message\ndata: {"jsonrpc":"2.0","id":2,"result":{"ok":true}}\n\n', 2);
@@ -23,9 +23,9 @@ test("rejects a datetime without timezone", () => {
   }), /timezone offset/);
 });
 
-test("accepts a stable workout key and positive revision", () => {
+test("accepts a stable workout key and source timestamp", () => {
   assert.equal(validateExternalId("apple_health:other_active:2026-09-11"), "apple_health:other_active:2026-09-11");
-  assert.equal(validateRevision(4), 4);
+  assert.equal(validateSourceUpdatedAt("2026-09-11T12:00:00Z"), "2026-09-11T12:00:00Z");
   assert.throws(() => validateExternalId("has/a/slash"), /workout key/);
-  assert.throws(() => validateRevision(0), /positive integer/);
+  assert.throws(() => validateSourceUpdatedAt("not a timestamp"), /ISO 8601/);
 });

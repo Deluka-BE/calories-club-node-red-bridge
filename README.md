@@ -156,7 +156,7 @@ Voorbeeld voor de overige actieve energie van 11 september:
 ```json
 PUT /workout/apple_health:other_active:2026-09-11
 {
-  "revision": 2,
+  "source_updated_at": "2026-09-11T13:04:28+02:00",
   "title": "Overige actieve activiteit",
   "emoji": "🔥",
   "activity_type": "other",
@@ -167,12 +167,12 @@ PUT /workout/apple_health:other_active:2026-09-11
 ```
 
 - Eerste nieuwe sleutel: de bridge maakt één entry aan en bewaart het entry-ID.
-- Zelfde `revision`: de bridge antwoordt met `action: "unchanged"` zonder een
-  MCP-aanroep.
-- Hogere `revision`: de bridge werkt diezelfde entry bij met
+- Zelfde inhoud: de bridge antwoordt met `action: "unchanged"` zonder een
+  MCP-aanroep. Dit blijft ook na een Node-RED-herstart werken.
+- Andere inhoud: de bridge werkt diezelfde entry bij met
   `update_workout_entry`.
-- Lagere `revision`: HTTP 409; een oudere berekening mag de nieuwere niet
-  overschrijven.
+- Een optionele, oudere `source_updated_at`: HTTP 409; een oudere berekening
+  mag de nieuwere niet overschrijven.
 - `DELETE /workout/<sleutel>` verwijdert de opgeslagen entry en de koppeling.
   Gebruik dit alleen voor een expliciete verwijderactie in Node-RED.
 
