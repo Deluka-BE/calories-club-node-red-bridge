@@ -25,6 +25,10 @@ const server = http.createServer(async (req, res) => {
       requireApiKey(req);
       return sendJson(res, 200, oauth.status());
     }
+    if (req.method === "GET" && url.pathname === "/tools") {
+      requireApiKey(req);
+      return sendJson(res, 200, { tools: await mcp.tools() });
+    }
     if (req.method === "POST" && url.pathname === "/login") {
       requireApiKey(req);
       return sendJson(res, 200, await oauth.startLogin());

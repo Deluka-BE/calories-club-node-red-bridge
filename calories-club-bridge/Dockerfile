@@ -1,7 +1,7 @@
 ARG BUILD_VERSION
 ARG BUILD_ARCH
 
-FROM ghcr.io/deluka-be/calories-club-node-red-bridge:v0.2.0
+FROM ghcr.io/deluka-be/calories-club-node-red-bridge:v0.3.0
 
 ARG BUILD_VERSION
 ARG BUILD_ARCH

@@ -15,6 +15,49 @@ export class McpClient {
     }
   }
 
+  async tools() {
+    try {
+      return await this.listTools(false);
+    } catch (error) {
+      if (error.status !== 401) throw error;
+      return this.listTools(true);
+    }
+  }
+
+  async listTools(forceRefresh) {
+    const token = await this.oauth.accessToken(forceRefresh);
+    const initialize = await this.post(token, null, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: this.config.protocolVersion,
+        capabilities: {},
+        clientInfo: { name: "node-red-calories-club-bridge", version: "1.0.0" }
+      }
+    }, 1);
+
+    const sessionId = initialize.sessionId;
+    await this.post(token, sessionId, {
+      jsonrpc: "2.0",
+      method: "notifications/initialized",
+      params: {}
+    });
+
+    const result = await this.post(token, sessionId, {
+      jsonrpc: "2.0",
+      id: 2,
+      method: "tools/list",
+      params: {}
+    }, 2);
+
+    const tools = result.payload?.result?.tools;
+    if (!Array.isArray(tools)) {
+      throw new HttpError(502, "Calories Club MCP returned no tool list");
+    }
+    return tools;
+  }
+
   async runSession(arguments_, forceRefresh) {
     const token = await this.oauth.accessToken(forceRefresh);
     const initialize = await this.post(token, null, {

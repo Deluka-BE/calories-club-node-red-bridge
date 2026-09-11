@@ -33,18 +33,23 @@ export class OAuthManager {
     this.config = config;
     this.store = store;
     this.pollPromise = null;
+    this.loginPromise = null;
   }
 
   status() {
     const state = this.store.get();
     const expiresAt = state.expires_at || null;
-    return {
+    const status = {
       authorized: Boolean(state.refresh_token || (state.access_token && expiresAt > Date.now())),
       client_registered: Boolean(state.client_id),
       login_pending: Boolean(state.device_code && state.device_expires_at > Date.now()),
       token_expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
       scopes: state.scope || this.config.scopes
     };
+    // Device-logingegevens zijn tijdelijk en bevatten geen token of secret.
+    // Ze zijn alleen via de met BRIDGE_API_KEY beveiligde /status-route zichtbaar.
+    if (status.login_pending) status.login = this.publicDeviceInfo(state);
+    return status;
   }
 
   async registerClient() {
@@ -68,6 +73,14 @@ export class OAuthManager {
   }
 
   async startLogin() {
+    if (!this.loginPromise) {
+      this.loginPromise = this.startLoginInternal()
+        .finally(() => { this.loginPromise = null; });
+    }
+    return this.loginPromise;
+  }
+
+  async startLoginInternal() {
     const state = this.store.get();
     if (this.status().authorized) return { already_authorized: true, ...this.status() };
     if (state.device_code && state.device_expires_at > Date.now()) {
@@ -119,7 +132,12 @@ export class OAuthManager {
   async pollDeviceToken() {
     let interval = this.store.get().device_interval || 5;
     while (this.store.get().device_expires_at > Date.now()) {
-      await new Promise((resolve) => setTimeout(resolve, interval * 1000));
+      // The HTTP server keeps the production process alive. Unref voorkomt dat
+      // alleen een wachtende device-login een gecontroleerde afsluiting blokkeert.
+      await new Promise((resolve) => {
+        const timer = setTimeout(resolve, interval * 1000);
+        timer.unref?.();
+      });
       const state = this.store.get();
       const form = new URLSearchParams({
         grant_type: "urn:ietf:params:oauth:grant-type:device_code",
@@ -189,6 +207,12 @@ export class OAuthManager {
     if (!response.ok || !body.access_token) {
       if (["invalid_grant", "invalid_token"].includes(body.error)) {
         await this.store.merge({ access_token: null, refresh_token: null, expires_at: null });
+        const login = await this.startLogin();
+        throw new HttpError(
+          401,
+          "Bridge authorization expired; complete device login",
+          { login }
+        );
       }
       throw safeRemoteError(response.status || 502, body, "Token refresh failed");
     }
