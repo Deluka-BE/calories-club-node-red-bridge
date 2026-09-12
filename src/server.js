@@ -5,6 +5,9 @@ import { OAuthManager } from "./oauth.js";
 import { McpClient } from "./mcp.js";
 import { WorkoutSync } from "./workout-sync.js";
 import { HttpError, readJson, sendJson, validateExternalId, validateSourceUpdatedAt, validateWorkout } from "./utils.js";
+import { installTimestampedConsole } from "./logger.js";
+
+installTimestampedConsole();
 
 const store = new StateStore(config.stateFile);
 await store.load();

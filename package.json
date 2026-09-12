@@ -1,6 +1,6 @@
 {
   "name": "calories-club-node-red-bridge",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": true,
   "type": "module",
   "description": "Small OAuth/MCP bridge between Node-RED and Calories Club",

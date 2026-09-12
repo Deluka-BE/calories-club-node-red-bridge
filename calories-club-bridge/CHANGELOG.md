@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3
+
+- Alle bridge-logregels krijgen een tijdstip in Europe/Brussels.
+- Voeg een Home Assistant-add-onpictogram en logo toe.
+
 ## 0.3.0
 
 - Toegevoegd: beveiligde, alleen-lezen `GET /tools`-route om de exacte

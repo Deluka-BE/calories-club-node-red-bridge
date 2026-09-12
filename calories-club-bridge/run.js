@@ -1,4 +1,7 @@
 import { readFile } from "node:fs/promises";
+import { installTimestampedConsole } from "./src/logger.js";
+
+installTimestampedConsole();
 
 const optionsPath = "/data/options.json";
 let options;
