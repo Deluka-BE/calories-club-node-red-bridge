@@ -1,5 +1,5 @@
 name: Calories Club Node-RED Bridge
-version: "0.4.3"
+version: "0.4.4"
 slug: calories_club_bridge
 description: OAuth- en MCP-bridge tussen Node-RED en Calories Club
 url: https://github.com/Deluka-BE/calories-club-node-red-bridge

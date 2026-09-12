@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.4
+
+- Herstel de add-onstart: de tijdstempellogger zit nu zelfstandig in de
+  add-onstarter en is dus altijd beschikbaar.
+
 ## 0.4.3
 
 - Alle bridge-logregels krijgen een tijdstip in Europe/Brussels.
